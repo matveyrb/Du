@@ -6,7 +6,8 @@ import java.io.File
 class Du(private val h: String, private val c: Boolean, private val si: Boolean,
          private val iFile: MutableList<File>) {
 
-    fun reader() {
+    fun reader():Any {
+        val listForTest = mutableListOf<Int>()
         val listForSum = mutableListOf<Int>()
         var text = ""
         for (i in iFile) {
@@ -26,8 +27,14 @@ class Du(private val h: String, private val c: Boolean, private val si: Boolean,
                 else -> listForSum.add(text.length)
             }
         }
-        if (c) println(listForSum.sumBy { it })
-        else for (i in listForSum)
-            println(i)
+        if (c) {
+            println(listForSum.sumBy { it })
+            return listForSum.sumBy { it }
+        }
+         for (i in listForSum) {
+             println(i)
+             listForTest.add(i)
+         }
+        return listForTest
     }
 }
