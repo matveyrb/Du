@@ -1,16 +1,35 @@
 package du
 
 import java.io.File
+import java.util.*
+
+fun listFilesWithSubFolders(dir: File): ArrayList<File>? {
+    val files = ArrayList<File>()
+    for (file in dir.listFiles()!!) {
+        if (file.isDirectory) files.addAll(listFilesWithSubFolders(file)!!) else files.add(file)
+    }
+    return files
+}
 
 
 class Du(private val h: String, private val c: Boolean, private val si: Boolean,
          private val iFile: MutableList<File>) {
 
-    fun reader():Any {
+
+
+    fun reader():Int {
+        var iterateList = iFile
+        if ('.' !in iFile[0].toString()) {
+            iterateList = listFilesWithSubFolders(iFile[0])!!.toMutableList()
+        }
+
         val listForTest = mutableListOf<Int>()
+        val resultList = mutableListOf<String>()
         val listForSum = mutableListOf<Int>()
-        var text = ""
-        for (i in iFile) {
+        var text:String
+        var unit = h
+
+        for (i in iterateList) {
             text = i.bufferedReader().readText()
             var kb = 1024
             var mb = 1024 * 1024
@@ -21,20 +40,32 @@ class Du(private val h: String, private val c: Boolean, private val si: Boolean,
                 gb = 1000 * 1000 * 1000
             }
             when (h) {
-                "KB" -> listForSum.add(text.length / kb)
-                "MB" -> listForSum.add(text.length / mb)
-                "GB" -> listForSum.add(text.length / gb)
-                else -> listForSum.add(text.length)
+                "KB" -> {
+                    listForSum.add(text.length / kb)
+                    resultList.add("Name: $i = ${(text.length / kb)} KB")
+                }
+                "MB" -> {
+                    listForSum.add(text.length / mb)
+                    resultList.add("Name: $i = ${(text.length / mb)} MB")
+                }
+                "GB" -> {
+                    listForSum.add(text.length / gb)
+                    resultList.add("Name: $i = ${(text.length / gb)} GB")
+                }
+                else -> {
+                    unit = "B"
+                    listForSum.add(text.length)
+                    resultList.add("Name: $i = ${text.length} B")
+                }
             }
         }
         if (c) {
-            println(listForSum.sumBy { it })
-            return listForSum.sumBy { it }
+            println("Sum of file sizes = ${listForSum.sumBy { it }} $unit")
+            return 0
         }
-         for (i in listForSum) {
-             println(i)
-             listForTest.add(i)
-         }
-        return listForTest
+        for (i in resultList) {
+            println(i)
+        }
+        return 0
     }
 }

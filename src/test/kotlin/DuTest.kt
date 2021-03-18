@@ -27,7 +27,7 @@ class DuTest {
         val file = File("words.txt")
         file.bufferedWriter().use {
             for (i in 0..3)
-                it.write("There is some text")
+                it.write("There is some ἱερο")
         }
         assertEquals(listOf(72), DuStart().start(arrayOf("words.txt")))
     }

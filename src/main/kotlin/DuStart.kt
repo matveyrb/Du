@@ -22,23 +22,22 @@ class DuStart {
     private var iFile = mutableListOf<File>()
 
 
-    fun start(args : Array<String>):Any{
+    fun start(args : Array<String>):Int{
         val parser = CmdLineParser(this)
         try {
             parser.parseArgument(*args)
         } catch (e: CmdLineException) {
-            println(e.message)
             println("du [-h|-c] [--si] file...")
             parser.printUsage(System.out)
-            return ""
+            return 1
         }
-        val result:Any
+        val result:Int
         return try {
             result = Du(h, c, si, iFile).reader()
             result
         } catch (e: IOException) {
             println(e.message)
-            ""
+            return 1
         }
     }
 }
