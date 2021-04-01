@@ -49,9 +49,17 @@ class Du(private val h: Boolean, private val c: Boolean, private val si: Boolean
 
 
     fun reader():Int {
-        var iterateList = iFile
-        if ('.' !in iFile[0].toString()) {
-            iterateList = listFilesWithSubFolders(iFile[0])!!.toMutableList()
+        val iterateList = mutableListOf<File>()
+        val preIterateList = iFile
+        for (i in preIterateList) {
+            if ('.' !in i.toString()) {
+                val addList = listFilesWithSubFolders(iFile[0])!!.toMutableList()
+                for (j in addList) {
+                    iterateList.add(j)
+                }
+            } else {
+                iterateList.add(i)
+            }
         }
         val listForTest = mutableListOf<Int>()
         val resultList = mutableListOf<String>()
