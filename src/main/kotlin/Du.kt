@@ -1,4 +1,5 @@
 package du
+import sun.font.LayoutPathImpl.getPath
 import java.io.IOException
 import java.nio.file.*
 
@@ -9,10 +10,10 @@ import java.io.File
 import java.util.*
 
 
-fun size(path: Path?): Long {
+fun size(path: Path): Long {
     val size = AtomicLong(0)
     try {
-        Files.walkFileTree(path!!, object : SimpleFileVisitor<Path>() {
+        Files.walkFileTree(path, object : SimpleFileVisitor<Path>() {
             override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult {
                 size.addAndGet(attrs.size())
                 return FileVisitResult.CONTINUE
@@ -53,10 +54,7 @@ class Du(private val h: Boolean, private val c: Boolean, private val si: Boolean
         val preIterateList = iFile
         for (i in preIterateList) {
             if ('.' !in i.toString()) {
-                val addList = listFilesWithSubFolders(iFile[0])!!.toMutableList()
-                for (j in addList) {
-                    iterateList.add(j)
-                }
+                iterateList.addAll(listFilesWithSubFolders(iFile[0])!!.toMutableList())
             } else {
                 iterateList.add(i)
             }
@@ -70,7 +68,7 @@ class Du(private val h: Boolean, private val c: Boolean, private val si: Boolean
         var gb = 1024 * 1024 * 1024
 
         for (i in iterateList) {
-            text = size(Paths.get(i.toString())).toDouble()
+            text = size(i.toPath()).toDouble()
             if (si) {
                 kb = 1000
                 mb = 1000 * 1000

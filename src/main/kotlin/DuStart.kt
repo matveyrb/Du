@@ -31,10 +31,8 @@ class DuStart {
             parser.printUsage(System.out)
             return 1
         }
-        val result:Int
         return try {
-            result = Du(h, c, si, iFile).reader()
-            result
+            Du(h, c, si, iFile).reader()
         } catch (e: IOException) {
             println(e.message)
             return 1
