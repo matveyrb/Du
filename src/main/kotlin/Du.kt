@@ -37,9 +37,11 @@ fun size(path: Path): Long {
 
 fun listFilesWithSubFolders(dir: File): ArrayList<File>? {
     val files = ArrayList<File>()
-    for (file in dir.listFiles()!!) {
-        if (file.isDirectory) files.addAll(listFilesWithSubFolders(file)!!) else files.add(file)
-    }
+    if (dir.isDirectory){
+        for (file in dir.listFiles()!!) {
+            if (file.isDirectory) files.addAll(listFilesWithSubFolders(file)!!) else files.add(file)
+        }
+    } else files.add(dir)
     return files
 }
 
@@ -50,15 +52,12 @@ class Du(private val h: Boolean, private val c: Boolean, private val si: Boolean
 
 
     fun reader():Int {
-        val iterateList = mutableListOf<File>()
-        val preIterateList = iFile
-        for (i in preIterateList) {
-            if ('.' !in i.toString()) {
-                iterateList.addAll(listFilesWithSubFolders(iFile[0])!!.toMutableList())
-            } else {
-                iterateList.add(i)
-            }
-        }
+        val iterateList = mutableSetOf<File>()
+       for (i in iFile){
+           iterateList.addAll(listFilesWithSubFolders(i)!!)
+       }
+
+
         val listForTest = mutableListOf<Int>()
         val resultList = mutableListOf<String>()
         val listForSum = mutableListOf<Double>()
