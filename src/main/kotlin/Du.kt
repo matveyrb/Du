@@ -43,7 +43,7 @@ fun listFilesWithSubFolders(dir: File): ArrayList<File>? {
 }
 
 
-class Du(private val h: String, private val c: Boolean, private val si: Boolean,
+class Du(private val h: Boolean, private val c: Boolean, private val si: Boolean,
          private val iFile: MutableList<File>) {
 
 
@@ -55,47 +55,67 @@ class Du(private val h: String, private val c: Boolean, private val si: Boolean,
         }
         val listForTest = mutableListOf<Int>()
         val resultList = mutableListOf<String>()
-        val listForSum = mutableListOf<Int>()
-        var text:Int
-        var unit = h
+        val listForSum = mutableListOf<Double>()
+        var text:Double
+        var kb = 1024
+        var mb = 1024 * 1024
+        var gb = 1024 * 1024 * 1024
 
         for (i in iterateList) {
-            text = size(Paths.get(i.toString())).toInt()
-            var kb = 1024
-            var mb = 1024 * 1024
-            var gb = 1024 * 1024 * 1024
+            text = size(Paths.get(i.toString())).toDouble()
             if (si) {
                 kb = 1000
                 mb = 1000 * 1000
                 gb = 1000 * 1000 * 1000
             }
-            when (h) {
-                "KB" -> {
-                    listForSum.add(text / kb)
-                    resultList.add("Name: $i = ${(text / kb)} KB")
+            if (h) {
+                when {
+                    text >= gb -> {
+                        listForSum.add((text))
+                        resultList.add("Name: $i = ${(text / gb)} GB")
+                    }
+                    text >= mb -> {
+                        listForSum.add(text)
+                        resultList.add("Name: $i = ${(text / mb)} MB")
+                    }
+                    text >= kb -> {
+                        listForSum.add(text)
+                        resultList.add("Name: $i = ${(text / kb)} KB")
+                    }
+                    text < kb -> {
+                            listForSum.add(text)
+                            resultList.add("Name: $i = ${(text)} B")
+                    }
                 }
-                "MB" -> {
-                    listForSum.add(text / mb)
-                    resultList.add("Name: $i = ${(text/ mb)} MB")
-                }
-                "GB" -> {
-                    listForSum.add(text / gb)
-                    resultList.add("Name: $i = ${(text/ gb)} GB")
-                }
-                else -> {
-                    unit = "B"
-                    listForSum.add(text)
-                    resultList.add("Name: $i = ${text} B")
-                }
+            } else {
+                listForSum.add(text)
+                resultList.add("Name: $i = $text B")
             }
         }
         if (c) {
-            println("Sum of file sizes = ${listForSum.sumBy { it }} $unit")
+            when (c) {
+                listForSum.sum() >= gb -> {
+                    println("Sum of file sizes = ${listForSum.sum() / gb} GB")
+                    return 0
+                }
+                listForSum.sum() >= mb -> {
+                    println("Sum of file sizes = ${listForSum.sum() / mb} MB")
+                    return 0
+                }
+                listForSum.sum() >= kb -> {
+                    println("Sum of file sizes = ${listForSum.sum() / kb} KB")
+                    return 0
+                }
+                listForSum.sum() < kb -> {
+                    println("Sum of file sizes = ${listForSum.sum()} B")
+                }
+            }
+        } else {
+            for (i in resultList) {
+                println(i)
+            }
             return 0
         }
-        for (i in resultList) {
-            println(i)
-        }
-        return 0
+        return 1
     }
 }

@@ -10,7 +10,7 @@ import java.io.IOException
 class DuStart {
 
     @Option(name = "-h", required = false)
-    private var h: String = ""
+    private var h: Boolean = false
 
     @Option(name = "-c", required = false)
     private var c: Boolean = false
