@@ -9,7 +9,7 @@ class DuTest {
         file.bufferedWriter().use {
             it.write("There is some text")
         }
-        assertEquals(18, DuStart().start(arrayOf("-c", "words.txt")))
+        assertEquals(listOf(18.0), DuStart().start(arrayOf("-c", "words.txt")))
     }
 
     @Test
@@ -19,7 +19,7 @@ class DuTest {
             for (i in 0..9999)
                 it.write("There is some text")
         }
-        assertEquals(180000, DuStart().start(arrayOf("-c", "words.txt")))
+        assertEquals(listOf(180000.0), DuStart().start(arrayOf("-c","words.txt")))
     }
 
     @Test
@@ -27,9 +27,9 @@ class DuTest {
         val file = File("words.txt")
         file.bufferedWriter().use {
             for (i in 0..3)
-                it.write("There is some ἱερο")
+                it.write("There is some text")
         }
-        assertEquals(listOf(72), DuStart().start(arrayOf("words.txt")))
+        assertEquals(listOf(72.0), DuStart().start(arrayOf("words.txt")))
     }
 
     @Test
@@ -44,7 +44,7 @@ class DuTest {
             for (i in 0..9999)
                 it.write("There is some text")
             }
-        assertEquals(360, DuStart().start(arrayOf("-h","KB","-c","--si","words.txt","moreWords.txt")))
+        assertEquals(listOf(360.0), DuStart().start(arrayOf("-h","-c","--si","words.txt","moreWords.txt")))
         }
     @Test
     fun taskTest4() {
@@ -58,6 +58,6 @@ class DuTest {
             for (i in 0..9999)
                 it.write("There is some text")
         }
-        assertEquals(listOf(180,180), DuStart().start(arrayOf("-h","KB","--si","words.txt","moreWords.txt")))
+        assertEquals(listOf(180.0,180.0), DuStart().start(arrayOf("-h","--si","words.txt","moreWords.txt")))
     }
 }

@@ -13,6 +13,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     implementation "junit:junit:4.12"
     implementation "args4j:args4j:2.33"
+    implementation group: 'commons-io', name: 'commons-io', version: '2.5'
 }
 
 compileKotlin {

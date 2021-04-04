@@ -1,49 +1,8 @@
 package du
-import sun.font.LayoutPathImpl.getPath
-import java.io.IOException
-import java.nio.file.*
 
-import java.nio.file.attribute.BasicFileAttributes
-
-import java.util.concurrent.atomic.AtomicLong
+import org.apache.commons.io.FileUtils.sizeOf
+import org.apache.commons.io.FileUtils.sizeOfDirectory
 import java.io.File
-import java.util.*
-
-
-fun size(path: Path): Long {
-    val size = AtomicLong(0)
-    try {
-        Files.walkFileTree(path, object : SimpleFileVisitor<Path>() {
-            override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult {
-                size.addAndGet(attrs.size())
-                return FileVisitResult.CONTINUE
-            }
-
-            override fun visitFileFailed(file: Path, exc: IOException): FileVisitResult {
-                println("skipped: $file ($exc)")
-                return FileVisitResult.CONTINUE
-            }
-
-            override fun postVisitDirectory(dir: Path, exc: IOException): FileVisitResult {
-                println("had trouble traversing: $dir ($exc)")
-                return FileVisitResult.CONTINUE
-            }
-        })
-    } catch (e: IOException) {
-        throw AssertionError("walkFileTree will not throw IOException if the FileVisitor does not")
-    }
-    return size.get()
-}
-
-fun listFilesWithSubFolders(dir: File): ArrayList<File>? {
-    val files = ArrayList<File>()
-    if (dir.isDirectory){
-        for (file in dir.listFiles()!!) {
-            if (file.isDirectory) files.addAll(listFilesWithSubFolders(file)!!) else files.add(file)
-        }
-    } else files.add(dir)
-    return files
-}
 
 
 class Du(private val h: Boolean, private val c: Boolean, private val si: Boolean,
@@ -51,23 +10,23 @@ class Du(private val h: Boolean, private val c: Boolean, private val si: Boolean
 
 
 
-    fun reader():Int {
-        val iterateList = mutableSetOf<File>()
-       for (i in iFile){
-           iterateList.addAll(listFilesWithSubFolders(i)!!)
-       }
+    fun reader():List<Double> {
+        val iterateList = iFile.toSet()
 
 
-        val listForTest = mutableListOf<Int>()
+        val listForTest = mutableListOf<Double>()
         val resultList = mutableListOf<String>()
         val listForSum = mutableListOf<Double>()
-        var text:Double
+        var sizeDouble:Double
         var kb = 1024
         var mb = 1024 * 1024
         var gb = 1024 * 1024 * 1024
 
         for (i in iterateList) {
-            text = size(i.toPath()).toDouble()
+           val size = if (i.isDirectory){
+                sizeOfDirectory(i)
+            } else sizeOf(i)
+            sizeDouble = size.toDouble()
             if (si) {
                 kb = 1000
                 mb = 1000 * 1000
@@ -75,52 +34,63 @@ class Du(private val h: Boolean, private val c: Boolean, private val si: Boolean
             }
             if (h) {
                 when {
-                    text >= gb -> {
-                        listForSum.add((text))
-                        resultList.add("Name: $i = ${(text / gb)} GB")
+                    sizeDouble >= gb -> {
+                        listForSum.add(sizeDouble)
+                        listForTest.add(sizeDouble / gb)
+                        resultList.add("Name: $i = ${(sizeDouble / gb)} GB")
                     }
-                    text >= mb -> {
-                        listForSum.add(text)
-                        resultList.add("Name: $i = ${(text / mb)} MB")
+                    sizeDouble >= mb -> {
+                        listForSum.add(sizeDouble)
+                        listForTest.add(sizeDouble / mb)
+                        resultList.add("Name: $i = ${(sizeDouble / mb)} MB")
                     }
-                    text >= kb -> {
-                        listForSum.add(text)
-                        resultList.add("Name: $i = ${(text / kb)} KB")
+                    sizeDouble >= kb -> {
+                        listForSum.add(sizeDouble)
+                        listForTest.add(sizeDouble / kb)
+                        resultList.add("Name: $i = ${(sizeDouble / kb)} KB")
                     }
-                    text < kb -> {
-                            listForSum.add(text)
-                            resultList.add("Name: $i = ${(text)} B")
+                    sizeDouble < kb -> {
+                            listForSum.add(sizeDouble)
+                            listForTest.add(sizeDouble)
+                            resultList.add("Name: $i = ${(sizeDouble)} B")
                     }
                 }
             } else {
-                listForSum.add(text)
-                resultList.add("Name: $i = $text B")
+                listForSum.add(sizeDouble)
+                listForTest.add(sizeDouble)
+                resultList.add("Name: $i = $sizeDouble B")
             }
         }
         if (c) {
-            when (c) {
-                listForSum.sum() >= gb -> {
-                    println("Sum of file sizes = ${listForSum.sum() / gb} GB")
-                    return 0
+            if (h) {
+                when (c) {
+                    listForSum.sum() >= gb -> {
+                        println("Sum of file sizes = ${listForSum.sum() / gb} GB")
+                        return listOf(listForSum.sum() / gb)
+                    }
+                    listForSum.sum() >= mb -> {
+                        println("Sum of file sizes = ${listForSum.sum() / mb} MB")
+                        return listOf(listForSum.sum() / mb)
+                    }
+                    listForSum.sum() >= kb -> {
+                        println("Sum of file sizes = ${listForSum.sum() / kb} KB")
+                        return listOf(listForSum.sum() / kb)
+                    }
+                    listForSum.sum() < kb -> {
+                        println("Sum of file sizes = ${listForSum.sum()} B")
+                        return listOf(listForSum.sum())
+                    }
                 }
-                listForSum.sum() >= mb -> {
-                    println("Sum of file sizes = ${listForSum.sum() / mb} MB")
-                    return 0
-                }
-                listForSum.sum() >= kb -> {
-                    println("Sum of file sizes = ${listForSum.sum() / kb} KB")
-                    return 0
-                }
-                listForSum.sum() < kb -> {
-                    println("Sum of file sizes = ${listForSum.sum()} B")
-                }
+            } else {
+                println("Sum of file sizes = ${listForSum.sum()} B")
+                return listOf(listForSum.sum())
             }
         } else {
             for (i in resultList) {
                 println(i)
             }
-            return 0
+            return listForTest
         }
-        return 1
+        return listForTest
     }
 }

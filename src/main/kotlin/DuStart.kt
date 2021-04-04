@@ -1,5 +1,6 @@
 package du
 
+
 import org.kohsuke.args4j.Argument
 import org.kohsuke.args4j.CmdLineException
 import org.kohsuke.args4j.CmdLineParser
@@ -22,20 +23,18 @@ class DuStart {
     private var iFile = mutableListOf<File>()
 
 
-    fun start(args : Array<String>):Int{
+    fun start(args : Array<String>):Any{
         val parser = CmdLineParser(this)
         try {
             parser.parseArgument(*args)
         } catch (e: CmdLineException) {
             println("du [-h|-c] [--si] file...")
             parser.printUsage(System.out)
-            return 1
         }
         return try {
             Du(h, c, si, iFile).reader()
         } catch (e: IOException) {
             println(e.message)
-            return 1
         }
     }
 }
